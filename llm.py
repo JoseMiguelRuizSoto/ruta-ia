@@ -16,6 +16,8 @@ def generar(prompt, config=None, intentos=4):
         try:
             return cliente.models.generate_content(model=GEMINI_MODEL, contents=prompt, config=config)
         except (errors.ServerError, httpx.TimeoutException) as e:
+            if i == intentos:
+                break  # último intento: no tiene sentido esperar
             print(f"  Intento {i}: sin respuesta del servidor ({type(e).__name__}). Reintento en {espera} s...")
             time.sleep(espera)
             espera *= 2

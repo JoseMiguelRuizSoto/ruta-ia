@@ -20,6 +20,10 @@ print(f"{'Ticket':<12}{'Modo':<8}{'Razonamiento':>14}  Respuesta")
 for nombre, ticket in tickets.items():
     for modo, config in modos.items():
         prompt = f"Clasifica este ticket en una sola palabra ({CATEGORIAS}): {ticket}"
-        resp = generar(prompt, config)
+        try:
+            resp = generar(prompt, config)
+        except RuntimeError:
+            print(f"{nombre:<12}{modo:<8}{'-':>14}  (sin respuesta)")
+            continue
         pensamiento = resp.usage_metadata.thoughts_token_count or 0
         print(f"{nombre:<12}{modo:<8}{pensamiento:>14}  {resp.text.strip()}")
