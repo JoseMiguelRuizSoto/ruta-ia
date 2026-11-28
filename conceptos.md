@@ -44,3 +44,27 @@ cambio una línea de configuración, no el código.
 3. ¿Cuándo reintento una llamada y cuándo no?
 4. ¿Por qué el modelo no recuerda la conversación anterior?
 5. ¿Qué pasa si no pongo timeout a una llamada externa?
+
+### Elegir el modelo adecuado
+Un modelo lite responde más rápido por dos razones independientes:
+1. Es más pequeño (menos parámetros): procesa cada token más rápido y cada token cuesta menos.
+2. No razona por defecto: genera muchos menos tokens. (Un modelo pequeño podría razonar si
+   se configura, y uno grande podría no hacerlo.)
+- Mis datos: para clasificar tickets, gemini-3.8-flash usó 171 y 266 tokens de razonamiento;
+  gemini-3.5-flash-lite usó 0, con las mismas respuestas. La tarea no era exigente.
+- Regla: primero definir la calidad mínima, medir qué modelos la cumplen y elegir
+  el más barato de esos. Nunca elegir solo por costo sin medir resultados.
+
+### Salida estructurada
+Obligar al modelo a responder con un JSON que sigue un esquema (definido con Pydantic):
+campos, tipos y valores permitidos (Enum).
+- Resuelve el problema de "Red" vs "red": la categoría solo puede ser un valor de la lista.
+- resp.parsed entrega un objeto de Python listo para usar o guardar en una base de datos.
+- OJO: garantiza el FORMATO, no que el contenido sea CORRECTO.
+
+### Las reglas de negocio van en el prompt
+El modelo no conoce las reglas de la empresa; si no se las doy, decide por su cuenta.
+- Ejemplo: para mí, facturación = cobros indebidos y descuentos no aplicados (por promociones
+  o por fallas del servicio). Un cambio de plan NO es facturación.
+- Conocer el negocio es fundamental para escribir buenos prompts: esa definición, escrita
+  en el prompt, vale más que cambiar de modelo.
